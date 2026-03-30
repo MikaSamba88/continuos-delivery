@@ -1,6 +1,8 @@
 stages:
   - build
   - test
+  - deploy
+  - cleanup
 
 build api:
   stage: build
@@ -8,23 +10,67 @@ build api:
   before_script:
     - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
   script:
-    - if test $CI_COMMIT_BRANCH = $CI_DEFAULT_BRANCH; then REGISTRY_TAG=latest; else REGISTRY_TAG=$CI_COMMIT_BRANCH; fi
+    - if test $CI_COMMIT_REF_NAME = $CI_DEFAULT_BRANCH; then REGISTRY_TAG=latest; else REGISTRY_TAG=$CI_COMMIT_REF_NAME; fi
     - docker buildx build -t $CI_REGISTRY_IMAGE:$REGISTRY_TAG --cache-from=$CI_REGISTRY_IMAGE:$REGISTRY_TAG --push . --target=deploy
     - docker buildx build -t $CI_REGISTRY_IMAGE:test-$REGISTRY_TAG --cache-from=test-$CI_REGISTRY_IMAGE:$REGISTRY_TAG --push . --target=test
-
   rules:
     - changes:
       - Dockerfile
-      - main.py
+      - "*.py"
       - requirements.txt
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH 
+      - test_requirements.txt
+      if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH || $CI_MERGE_REQUEST_ID
 
+build utils:
+  stage: build
+  image: docker:29
+  before_script:
+    - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
+  script:
+    - docker buildx build -t ${CI_REGISTRY_IMAGE}/utils:latest --push --file Dockerfile-utils .
+  rules:
+    - changes:
+        - Dockerfile-utils
+      if: $CI_MERGE_REQUEST_ID || $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+
+#https://git.chas-lab.dev/doe25/test-rest/-/tree/tdd?ref_type=heads
 test api:
   stage: test
-  image: $CI_REGISTRY_IMAGE:test-$CI_COMMIT_BRANCH
-  # gitlab coverage report: https://docs.gitlab.com/ci/testing/code_coverage/
+  image: $CI_REGISTRY_IMAGE:test-$CI_COMMIT_REF_NAME
+  #gitlab coverage report: https://docs.gitlab.com/ci/testing/code_coverage/
   script:
-    - pytest --cov
+    - pytest --cov --cov-fail-under=90
   coverage: '/TOTAL.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
   rules:
-    - if: $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH
+    - if: $CI_MERGE_REQUEST_ID
+      changes:
+        - "*.py"
+
+deploy api:
+  stage: deploy
+  image: ${CI_REGISTRY_IMAGE}/utils:latest
+  environment:
+    name: review/$CI_COMMIT_REF_SLUG
+    url: https://$CI_PROJECT_NAMESPACE_SLUG-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG.doe25.swarm.chas-lab.dev/docs
+    on_stop: stop_review
+  script:
+    - sh deploy.sh
+  rules:
+    - if: $CI_MERGE_REQUEST_ID
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+
+stop_review:
+  stage: cleanup
+  image: $CI_REGISTRY_IMAGE/utils:latest
+  environment:
+    name: review/$CI_COMMIT_REF_SLUG
+    action: stop
+  script:
+    - sh delete-stack.sh
+  rules:
+    - if: $CI_MERGE_REQUEST_ID
+      when: manual
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+      when: manual
+
+

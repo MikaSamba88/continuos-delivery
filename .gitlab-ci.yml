@@ -8,7 +8,8 @@ build api:
   before_script:
     - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
   script:
-    - docker buildx build -t $CI_REGISTRY_IMAGE:latest --cache-from=$CI_REGISTRY_IMAGE:latest --push .
+    - if test $CI_COMMIT_BRANCH = $CI_DEFAULT_BRANCH; then REGISTRY_TAG=latest; else REGISTRY_TAG=$CI_COMMIT_BRANCH; fi
+    - docker buildx build -t $CI_REGISTRY_IMAGE:$REGISTRY_TAG --cache-from=$CI_REGISTRY_IMAGE:$REGISTRY_TAG --push .
   rules:
     - changes:
       - Dockerfile
@@ -18,8 +19,10 @@ build api:
 
 test api:
   stage: test
-  image: $CI_REGISTRY_IMAGE:latest
+  image: $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH
   # gitlab coverage report: https://docs.gitlab.com/ci/testing/code_coverage/
   script:
     - pytest --cov
   coverage: '/TOTAL.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
+  rules:
+    - if: $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH

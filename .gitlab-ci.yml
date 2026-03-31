@@ -19,7 +19,7 @@ build api:
       - "*.py"
       - requirements.txt
       - test_requirements.txt
-      if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH 
+      if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH || $CI_MERGE_REQUEST_ID
 
 test api:
   stage: test
@@ -29,4 +29,6 @@ test api:
     - pytest --cov --cov-fail-under-90
   coverage: '/TOTAL.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
   rules:
-    - if: $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH
+    - if $CI_MERGE_REQUEST_ID
+      changes:
+        - "*.py"

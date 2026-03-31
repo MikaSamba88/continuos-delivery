@@ -10,9 +10,8 @@ build api:
   before_script:
     - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
   script:
-    - if test $CI_COMMIT_BRANCH = $CI_DEFAULT_BRANCH; then REGISTRY_TAG=latest; else REGISTRY_TAG=$CI_COMMIT_BRANCH; fi
-    - docker buildx build -t $CI_REGISTRY_IMAGE:$REGISTRY_TAG --cache-from=$CI_REGISTRY_IMAGE:$REGISTRY_TAG --push . --target=deploy
-    - docker buildx build -t $CI_REGISTRY_IMAGE:test-$REGISTRY_TAG --cache-from=test-$CI_REGISTRY_IMAGE:$REGISTRY_TAG --push . --target=test
+    - docker buildx build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG --cache-from=$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG --push . --target=deploy
+    - docker buildx build -t $CI_REGISTRY_IMAGE:test-$CI_COMMIT_REF_SLUG --cache-from=$CI_REGISTRY_IMAGE:test-$CI_COMMIT_REF_SLUG --push . --target=test
 
   rules:
     - changes:

@@ -1,10 +1,12 @@
 stages:
   - build
   - test
+default:
+  tags:
+    - lab-vm
 
 build api:
   stage: build
-  tags: lab-vm
   image: docker:29
   before_script:
     - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
@@ -21,7 +23,6 @@ build api:
 
 test api:
   stage: test
-  tags: lab-vm
   image: $CI_REGISTRY_IMAGE:test-$CI_COMMIT_BRANCH
   # gitlab coverage report: https://docs.gitlab.com/ci/testing/code_coverage/
   script:

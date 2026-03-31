@@ -3,7 +3,7 @@ stages:
   - test
 default:
   tags:
-    - lab-vm
+    - first-runner
 
 build api:
   stage: build

@@ -27,3 +27,4 @@ test api:
     - pytest --cov
   coverage: '/TOTAL.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
   rules:
+    - if: $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH

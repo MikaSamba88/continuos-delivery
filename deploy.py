@@ -28,14 +28,17 @@ def get_endpoint_info():
     try:
         response = requests.get(url, headers=headers, verify=False)
         response.raise_for_status()
-
         endpoints = response.json()
+
         for ep in endpoints:
             if ep["Name"] == "local-swarm":
-                return ep["Id"]
+                sid = ep.get("Snapshot", {}).get("SwarmId", "")
+                return ep["Id"], sid
             
-        # If Endpoint not found, take first available
-        return endpoints[0]["Id"] if endpoints else None
+        if endpoints:
+            sid = endpoints[0].get("Snapshot", {}).get("SwarmId", "")
+            return endpoints[0]["Id"], sid
+        return None, None
     except Exception as e:
         print(f"Error fetching endpoints: {e}")
         sys.exit(1)
@@ -76,7 +79,7 @@ def deploy_stack(endpoint_id, swarm_id):
 
 if __name__ == "__main__":
     eid, sid = get_endpoint_info()
-    if eid and sid:
+    if eid:
         deploy_stack(eid, sid)
         print(f"Deploying to Portainer Endpoint ID: {eid}")
     else:

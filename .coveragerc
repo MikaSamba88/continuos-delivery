@@ -1,0 +1,5 @@
+[run]
+omit = 
+    delete.py
+    deploy.py
+    test_main.py

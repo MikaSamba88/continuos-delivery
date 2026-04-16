@@ -22,31 +22,33 @@ headers = {
     "Content-Type": "application/json"
 }
 
-def get_endpoint_id():
+def get_endpoint_info():
     """Finding ID for Environment"""
     url = f"{PORTAINER_URL}/api/endpoints"
     try:
         response = requests.get(url, headers=headers, verify=False)
         response.raise_for_status()
-
         endpoints = response.json()
+
         for ep in endpoints:
-            if ep["Name"] == "local":
+            snapshot = ep.get("Snapshot", [{}])
+            swarm_id = snapshot[0].get("Swarmid", "")
+            if swarm_id:
+                print(f"Found Swarm Endpoint: {ep['Name']} (ID: {ep['Id']}) with Swarm ID: {swarm_id}")
                 return ep["Id"]
             
         # If Endpoint not found, take first available
-        return endpoints[0]["Id"] if endpoints else None
+        return endpoints[0]["Id"], endpoints[0]["Snapshot"][0].get("Swarmid", "")
     except Exception as e:
         print(f"Error fetching endpoints: {e}")
         sys.exit(1)
 
-def deploy_stack(endpoint_id):
+def deploy_stack(endpoint_id, swarm_id):
 # Deploying stack to Portainer
     with open(COMPOSE_FILE, 'r') as f:
         compose_content = f.read()
     stack_url = f"{PORTAINER_URL}/api/stacks"
-    params = {"filters": json.dumps({"Name": [STACK_NAME]})}
-    r_list = requests.get(stack_url, headers=headers, params=params, verify=False)
+    r_list = requests.get(stack_url, headers=headers, verify=False)
     existing_stacks = [s for s in r_list.json() if s["Name"] == STACK_NAME]
 
     if existing_stacks:
@@ -54,22 +56,19 @@ def deploy_stack(endpoint_id):
         print(f"Updating existing stack '{STACK_NAME}' (ID: {stack_id})")
         url = f"{PORTAINER_URL}/api/stacks/{stack_id}?endpointId={endpoint_id}"
         payload = {
-            "stackFileContent": compose_content,
+            "StackFileContent": compose_content,
             "prune": True,
             "pullImage": True
         }
         r = requests.put(url, headers=headers, json=payload, verify=False)
     else:
-        print(f"Creating new stack '{STACK_NAME}'")
-        url = f"{PORTAINER_URL}/api/stacks/create/swarm/file?endpointId={endpoint_id}"
+        print(f"Creating new stack '{STACK_NAME}' on Swarm: {swarm_id}")
+        url = f"{PORTAINER_URL}/api/stacks/create/swarm/string?endpointId={endpoint_id}"
         payload = {
             "name": STACK_NAME,
-            "swarmID": "",  # Optional, can be left empty for default
+            "swarmID": swarm_id,  # Optional, can be left empty for default
             "stackFileContent": compose_content,
-            "prune": True
-
         }
-        print(url)
         r = requests.post(url, headers=headers, json=payload, verify=False)
     if r.status_code in [200, 204]:
         print(f"Stack '{STACK_NAME}' deployed successfully.")
@@ -78,9 +77,9 @@ def deploy_stack(endpoint_id):
         sys.exit(1)
 
 if __name__ == "__main__":
-    eid = get_endpoint_id()
-    if eid:
-        deploy_stack(eid)
+    eid, sid = get_endpoint_info()
+    if eid and sid:
+        deploy_stack(eid, sid)
         print(f"Deploying to Portainer Endpoint ID: {eid}")
     else:
         print("No endpoints found in Portainer.")

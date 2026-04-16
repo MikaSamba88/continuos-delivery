@@ -7,7 +7,7 @@ import json
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 # From Gitlab CI/CD
 PORTAINER_URL = os.getenv("PORTAINER_URL")
-PORTAINER_TOKEN = os.getenv("PORTAINER_API_TOKEN")
+PORTAINER_TOKEN = os.getenv("PORTAINER_PASSWORD")
 STACK_NAME = os.getenv("CI_COMMIT_REF_SLUG", "default-stack") # Using branch name as stack name 
 # Load the compose-file
 COMPOSE_FILE = "docker-compose.yml" 
@@ -59,7 +59,7 @@ def deploy_stack(endpoint_id):
         r = requests.put(url, headers=headers, json=payload, verify=False)
     else:
         print(f"Creating new stack '{STACK_NAME}'")
-        url = f"{PORTAINER_URL}/api/stacks/create/standalone/string?endpointId={endpoint_id}"
+        url = f"{PORTAINER_URL}/api/stacks/create/swarm/file?endpointId={endpoint_id}"
         payload = {
             "Name": STACK_NAME,
             "StackFileContent": compose_content,

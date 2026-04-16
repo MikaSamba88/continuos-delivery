@@ -70,7 +70,10 @@ stop_review:
     name: review/$CI_COMMIT_REF_SLUG
     action: stop
   script:
-    - python delete-stack.py
+    - python delete.py
+  variables:
+    PORTAINER_URL: "https://portainer.doe25.swarm.chas-lab.dev"
+    PORTAINER_TOKEN: $PORTAINER_TOKEN
   rules:
     - if: $CI_MERGE_REQUEST_ID
       when: manual

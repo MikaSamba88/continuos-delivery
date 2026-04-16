@@ -89,7 +89,7 @@ def deploy_stack(endpoint_id):
 if __name__ == "__main__":
     eid, _ = get_endpoint_info()
     if eid:
-        deploy_stack(eid, sid)
+        deploy_stack(eid)
         print(f"Deploying to Portainer Endpoint ID: {eid}")
     else:
         print("No endpoints found in Portainer.")

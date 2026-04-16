@@ -54,7 +54,7 @@ def deploy_stack(endpoint_id):
         print(f"Updating existing stack '{STACK_NAME}' (ID: {stack_id})")
         url = f"{PORTAINER_URL}/api/stacks/{stack_id}?endpointId={endpoint_id}"
         payload = {
-            "StackFileContent": compose_content,
+            "stackFileContent": compose_content,
             "prune": True,
             "pullImage": True
         }
@@ -63,9 +63,10 @@ def deploy_stack(endpoint_id):
         print(f"Creating new stack '{STACK_NAME}'")
         url = f"{PORTAINER_URL}/api/stacks/create/swarm/file?endpointId={endpoint_id}"
         payload = {
-            "Name": STACK_NAME,
-            "StackFileContent": compose_content,
-            "Prune": True
+            "name": STACK_NAME,
+            "stackFileContent": compose_content,
+            "prune": True
+            
         }
         print(url)
         r = requests.post(url, headers=headers, json=payload, verify=False)

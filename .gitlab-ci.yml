@@ -55,16 +55,13 @@ deploy api:
     on_stop: stop_review
   script:
     - python deploy.py
+  variables:
+    PORTAINER_URL: "https://portainer.doe25.swarm.chas-lab.dev"
+    PORTAINER_TOKEN: $PORTAINER_TOKEN
   rules:
     - if: $CI_MERGE_REQUEST_ID
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
 
-deploy_job:
-  stage: deploy
-  variables:
-    PORTAINER_URL: "https://din-portainer-url.se"
-  script:
-    - python deploy.py
     
 stop_review:
   stage: cleanup

@@ -39,7 +39,7 @@ test api:
   image: $CI_REGISTRY_IMAGE:test-$CI_COMMIT_REF_NAME
   #gitlab coverage report: https://docs.gitlab.com/ci/testing/code_coverage/
   script:
-    - pytest --cov --cov-fail-under=80
+    - pytest --cov --cov-fail-under=90
   coverage: '/TOTAL.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
   rules:
     - if: $CI_MERGE_REQUEST_ID

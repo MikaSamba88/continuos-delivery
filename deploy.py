@@ -14,11 +14,12 @@ COMPOSE_FILE = "docker-compose.yml"
 
 
 if not PORTAINER_URL or not PORTAINER_TOKEN:
-    print("Error: PORTAINER_URL and PORTAINER_API_TOKEN environment variables must be set.")
+    print("Error: PORTAINER_URL and PORTAINER_PASSWORD environment variables must be set.")
     sys.exit(1)
 
 headers = {
-    "X-API-Key": PORTAINER_TOKEN
+    "X-API-Key": PORTAINER_TOKEN,
+    "Content-Type": "application/json"
 }
 
 def get_endpoint_id():
@@ -46,7 +47,7 @@ def deploy_stack(endpoint_id):
     stack_url = f"{PORTAINER_URL}/api/stacks"
     params = {"filters": json.dumps({"Name": [STACK_NAME]})}
     r_list = requests.get(stack_url, headers=headers, params=params, verify=False)
-    existing_stacks = r_list.json()
+    existing_stacks = [s for s in r_list.json() if s["Name"] == STACK_NAME]
 
     if existing_stacks:
         stack_id = existing_stacks[0]["Id"]
@@ -54,7 +55,8 @@ def deploy_stack(endpoint_id):
         url = f"{PORTAINER_URL}/api/stacks/{stack_id}?endpointId={endpoint_id}"
         payload = {
             "StackFileContent": compose_content,
-            "prune": True
+            "prune": True,
+            "pullImage": True
         }
         r = requests.put(url, headers=headers, json=payload, verify=False)
     else:

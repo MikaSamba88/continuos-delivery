@@ -31,14 +31,14 @@ def get_endpoint_info():
         endpoints = response.json()
 
         for ep in endpoints:
-            snapshot = ep.get("Snapshot", [{}])
-            swarm_id = snapshot[0].get("Swarmid", "")
+            snapshots = ep.get("Snapshots", [{}])
+            swarm_id = snapshots[0].get("Swarmid", "")
             if swarm_id:
                 print(f"Found Swarm Endpoint: {ep['Name']} (ID: {ep['Id']}) with Swarm ID: {swarm_id}")
                 return ep["Id"]
             
         # If Endpoint not found, take first available
-        return endpoints[0]["Id"], endpoints[0]["Snapshot"][0].get("Swarmid", "")
+        return endpoints[0]["Id"], endpoints[0]["Snapshots"][0].get("Swarmid", "")
     except Exception as e:
         print(f"Error fetching endpoints: {e}")
         sys.exit(1)

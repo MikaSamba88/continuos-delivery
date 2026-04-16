@@ -7,14 +7,14 @@ import json
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 # From Gitlab CI/CD
 PORTAINER_URL = os.getenv("PORTAINER_URL")
-PORTAINER_TOKEN = os.getenv("PORTAINER_PASSWORD")
+PORTAINER_TOKEN = os.getenv("PORTAINER_TOKEN")
 STACK_NAME = os.getenv("CI_COMMIT_REF_SLUG", "default-stack") # Using branch name as stack name 
 # Load the compose-file
 COMPOSE_FILE = "docker-compose.yml" 
 
 
 if not PORTAINER_URL or not PORTAINER_TOKEN:
-    print("Error: PORTAINER_URL and PORTAINER_PASSWORD environment variables must be set.")
+    print("Error: PORTAINER_URL and PORTAINER_TOKEN environment variables must be set.")
     sys.exit(1)
 
 headers = {
@@ -32,11 +32,11 @@ def get_endpoint_info():
 
         for ep in endpoints:
             if ep["Name"] == "local-swarm":
-                sid = ep.get("Snapshot", {}).get("SwarmId", "")
+                sid = ep.get("Snapshot", {}).get("swarmId", "")
                 return ep["Id"], sid
             
         if endpoints:
-            sid = endpoints[0].get("Snapshot", {}).get("SwarmId", "")
+            sid = endpoints[0].get("Snapshot", {}).get("swarmId", "")
             return endpoints[0]["Id"], sid
         return None, None
     except Exception as e:
@@ -64,7 +64,7 @@ def deploy_stack(endpoint_id, swarm_id):
         r = requests.put(url, headers=headers, json=payload, verify=False)
     else:
         print(f"Creating new stack '{STACK_NAME}' on Swarm: {swarm_id}")
-        url = f"{PORTAINER_URL}/api/stacks/create/swarm/string?endpointId={endpoint_id}"
+        url = f"{PORTAINER_URL}/api/stacks/create/swarm?endpointId={endpoint_id}"
         payload = {
             "name": STACK_NAME,
             "swarmID": swarm_id,  # Optional, can be left empty for default

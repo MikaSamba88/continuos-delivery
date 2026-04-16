@@ -9,9 +9,9 @@ def test_read_main():
     assert response.json() == {"Hello": "World"}
 
 def test_read_items():
-    response = client.get("/items/42")
+    response = client.get("/items/42?q=TEST")
     assert response.status_code == 200
-    assert response.json() == {"item_id": 42, "q": "TEST"}
+    assert response.json() == {"item_id": "42", "q": "TEST"}
 
 def test_who():
     response = client.get("/who")

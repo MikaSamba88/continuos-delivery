@@ -8,12 +8,12 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # From Gitlab CI/CD
 PORTAINER_URL = os.getenv("PORTAINER_URL")
-PORTAINER_TOKEN = os.getenv("PORTAINER_API_TOKEN")
+PORTAINER_TOKEN = os.getenv("PORTAINER_TOKEN")
 # Same logic as in deploy.py to determine stack name
 STACK_NAME = os.getenv("CI_COMMIT_REF_SLUG")
 
 if not PORTAINER_URL or not PORTAINER_TOKEN:
-    print("Error: PORTAINER_URL and PORTAINER_API_TOKEN environment variables must be set.")
+    print("Error: PORTAINER_URL and PORTAINER_TOKEN environment variables must be set.")
     sys.exit(1)
 
 if not STACK_NAME:
@@ -58,7 +58,4 @@ def delete_stack():
         sys.exit(1)
 
 if __name__ == "__main__":
-    if not STACK_NAME:
-        print("Error: CI_COMMIT_REF_SLUG environment variable is not set.")
-        sys.exit(1)
     delete_stack()

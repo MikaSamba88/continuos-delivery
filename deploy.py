@@ -64,9 +64,10 @@ def deploy_stack(endpoint_id):
         url = f"{PORTAINER_URL}/api/stacks/create/swarm/file?endpointId={endpoint_id}"
         payload = {
             "name": STACK_NAME,
+            "SwarmID": "",  # Optional, can be left empty for default
             "stackFileContent": compose_content,
             "prune": True
-            
+
         }
         print(url)
         r = requests.post(url, headers=headers, json=payload, verify=False)

@@ -58,7 +58,7 @@ deploy api:
     CI_REGISTRY_IMAGE: $CI_REGISTRY_IMAGE
     IMAGE_TAG: $CI_COMMIT_REF_NAME
   script:
-    - python deploy.py
+    - python deploy2.py
   rules:
     - if: $CI_MERGE_REQUEST_ID
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH

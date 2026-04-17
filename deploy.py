@@ -24,6 +24,8 @@ headers = {
 def get_endpoint_id():
     """Finding ID for Environment"""
     url = f"{PORTAINER_URL}/api/endpoints"
+    print(f"Debug: URL is {url}") # Kolla om det blir dubbla // här
+    print(f"Debug: Token length is {len(API_KEY) if API_KEY else 'EMPTY'}")
     try:
         response = requests.get(url, headers=headers, verify=False)
         response.raise_for_status()

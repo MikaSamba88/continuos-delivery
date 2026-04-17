@@ -45,6 +45,9 @@ def deploy_stack(endpoint_id):
 # Deploying stack to Portainer
     with open(COMPOSE_FILE, 'r') as f:
         compose_content = f.read()
+        compose_content = compose_content.replace("${CI_REGISTRY_IMAGE}", os.getenv("CI_REGISTRY_IMAGE", ""))
+        tag = os.getenv("CI_COMMIT_REF_NAME", "latest")
+        compose_content = compose_content.replace("${REGISTRY_TAG}", tag)
     stack_url = f"{PORTAINER_URL}/api/stacks"
     params = {"filters": json.dumps({"Name": [STACK_NAME]})}
     r_list = requests.get(stack_url, headers=headers, params=params, verify=False)

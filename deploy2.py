@@ -5,7 +5,7 @@ import sys
 # Config variables from Gitlab
 PORTAINER_URL = os.getenv("PORTAINER_URL")
 API_TOKEN = os.getenv("PORTAINER_TOKEN")
-ENDPOINT_ID = os.getenv("ENDPOINT_ID")
+ENDPOINT_ID = 8
 STACK_NAME = os.getenv("CI_ENVIROMENT_SLUG", "default-stack")
 COMPOSE_FILE = "docker-compose.yml"
 

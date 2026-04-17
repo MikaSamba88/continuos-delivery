@@ -57,7 +57,6 @@ deploy api:
     - python deploy.py
   variables:
     PORTAINER_URL: "https://portainer.doe25.swarm.chas-lab.dev"
-    PORTAINER_TOKEN: $PORTAINER_TOKEN
   rules:
     - if: $CI_MERGE_REQUEST_ID
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH

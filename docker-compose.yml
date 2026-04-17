@@ -15,4 +15,4 @@ services:
 networks:
   traefik-public:
     external: true
-    name: "ingress"  # Detta är din "räddare i nöden" mot felmeddelandet
+    name: "u2vny23362londw734lqofhvz"  # Detta är din "räddare i nöden" mot felmeddelandet

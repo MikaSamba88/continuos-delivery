@@ -50,7 +50,8 @@ def deploy_stack(endpoint_id):
 
     compose_content = compose_content.replace("${CI_REGISTRY_IMAGE}", image_path)
     compose_content = compose_content.replace("${IMAGE_TAG}", image_tag)
-    compose_content = compose_content.replace("$STACK_NAME", STACK_NAME)
+    compose_content = compose_content.replace("${STACK_NAME}", STACK_NAME)
+    print(f"DEBUG: Image line is: {[line for line in compose_content.splitlines() if 'image:' in line]}")
 
     stack_url = f"{PORTAINER_URL}/api/stacks"
     params = {"filters": json.dumps({"Name": [STACK_NAME]})}

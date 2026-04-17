@@ -13,7 +13,7 @@ STACK_NAME = os.getenv("CI_COMMIT_REF_SLUG", "default-stack") # Using branch nam
 COMPOSE_FILE = "docker-compose.yml" 
 
 
-if not PORTAINER_URL or not PORTAINER_TOKEN:
+if not PORTAINER_URL or not API_KEY:
     print("Error: PORTAINER_URL and PORTAINER_API_TOKEN environment variables must be set.")
     sys.exit(1)
 

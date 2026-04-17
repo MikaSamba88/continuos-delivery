@@ -53,10 +53,12 @@ deploy api:
     name: review/$CI_COMMIT_REF_SLUG
     url: https://$CI_PROJECT_NAMESPACE_SLUG-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG.doe25.swarm.chas-lab.dev/docs
     on_stop: stop_review
-  script:
-    - python deploy.py
   variables:
     PORTAINER_URL: "https://portainer.doe25.swarm.chas-lab.dev"
+    CI_REGISTRY_IMAGE: $CI_REGISTRY_IMAGE
+    IMAGE_TAG: $CI_COMMIT_REF_NAME
+  script:
+    - python deploy.py
   rules:
     - if: $CI_MERGE_REQUEST_ID
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH

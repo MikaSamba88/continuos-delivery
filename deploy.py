@@ -18,7 +18,7 @@ if not PORTAINER_URL or not PORTAINER_TOKEN:
     sys.exit(1)
 
 headers = {
-    "X-API-Key": PORTAINER_TOKEN
+    "X-API-Key": f"Bearer {PORTAINER_TOKEN}"
 }
 
 def get_endpoint_id():

@@ -7,8 +7,8 @@ import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # From Gitlab CI/CD
-PORTAINER_API_URL = os.getenv("PORTAINER_API_URL", "https://portainer.doe25.swarm.chas-lab.dev/api")
-PORTAINER_PASSWORD = os.getenv("PORTAINER_PASSWORD")
+PORTAINER_API_URL = os.getenv("PORTAINER_URL", "https://portainer.doe25.swarm.chas-lab.dev")
+PORTAINER_PASSWORD = os.getenv("PORTAINER_TOKEN")
 CI_PROJECT_NAMESPACE_SLUG = os.getenv("CI_PROJECT_NAMESPACE_SLUG", "default")
 CI_PROJECT_NAME = os.getenv("CI_PROJECT_NAME", "project")
 CI_COMMIT_REF_SLUG = os.getenv("CI_COMMIT_REF_SLUG", "main")

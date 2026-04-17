@@ -7,7 +7,7 @@ import json
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 # From Gitlab CI/CD
 PORTAINER_URL = os.getenv("PORTAINER_URL")
-PORTAINER_TOKEN = os.getenv("PORTAINER_API_TOKEN")
+PORTAINER_TOKEN = os.getenv("PORTAINER_TOKEN")
 STACK_NAME = os.getenv("CI_COMMIT_REF_SLUG", "default-stack") # Using branch name as stack name 
 # Load the compose-file
 COMPOSE_FILE = "docker-compose.yml" 

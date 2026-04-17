@@ -49,7 +49,7 @@ def deploy_stack(endpoint_id):
     image_tag = os.getenv("IMAGE_TAG", "latest")
 
     compose_content = compose_content.replace("${CI_REGISTRY_IMAGE}", image_path)
-    compose_content = compose_content.replace("${REGISTRY_TAG}", image_tag)
+    compose_content = compose_content.replace("${IMAGE_TAG}", image_tag)
     compose_content = compose_content.replace("$STACK_NAME", STACK_NAME)
 
     stack_url = f"{PORTAINER_URL}/api/stacks"

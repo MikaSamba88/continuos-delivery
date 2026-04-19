@@ -8,11 +8,11 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # From Gitlab CI/CD
 PORTAINER_URL = os.getenv("PORTAINER_URL")
-PORTAINER_TOKEN = os.getenv("PORTAINER_TOKEN")
+API_KEY = os.getenv("PORTAINER_TOKEN")
 # Same logic as in deploy.py to determine stack name
 STACK_NAME = f"{os.getenv('GITLAB_USER_LOGIN', 'unknown')}-{os.getenv('CI_COMMIT_REF_SLUG', 'default-stack')}"
 
-if not PORTAINER_URL or not PORTAINER_TOKEN:
+if not PORTAINER_URL or not API_KEY:
     print("Error: PORTAINER_URL and PORTAINER_TOKEN environment variables must be set.")
     sys.exit(1)
 
@@ -22,7 +22,7 @@ if not STACK_NAME:
 
 
 headers = {
-    "X-API-Key": PORTAINER_TOKEN
+    "X-API-Key": API_KEY
 }
 
 # Find the stack by name and delete it using the Portainer API

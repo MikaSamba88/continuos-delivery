@@ -41,7 +41,8 @@ def delete_stack():
             return
         
         delete_url = f"{PORTAINER_URL}/api/stacks/{stack['Id']}?endpointId={endpoint_id}"
-        print(f"Deleting from: {delete_url}")
+        params = {"endpointId": endpoint_id}
+        print(f"Trying to delete stack with URL: {delete_url} and params: {params}")
         
         response = requests.delete(delete_url, headers=headers, verify=False)
         response.raise_for_status()

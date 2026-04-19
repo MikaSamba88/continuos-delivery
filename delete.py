@@ -9,7 +9,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 PORTAINER_URL = os.getenv("PORTAINER_URL")
 API_KEY = os.getenv("PORTAINER_TOKEN")
-STACK_NAME = f"{os.getenv('GITLAB_USER_LOGIN', 'unknown')}-{os.getenv('CI_COMMIT_REF_SLUG', 'default-stack')}"
+STACK_NAME = f"{os.getenv('CI_PROJECT_NAME', 'api')}-{os.getenv('CI_COMMIT_REF_SLUG', 'dev')}"
 
 headers = {
     "X-API-Key": API_KEY

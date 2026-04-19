@@ -20,6 +20,7 @@ if not STACK_NAME:
     print("Error: CI_COMMIT_REF_SLUG environment variable is not set.")
     sys.exit(1)
 
+
 headers = {
     "X-API-Key": PORTAINER_TOKEN
 }
@@ -39,6 +40,11 @@ def delete_stack():
 
         if not stacks:
             print(f"Stack '{STACK_NAME}' not found.")
+            print(f"DEBUG: Looking for stack: {STACK_NAME}")
+
+            r_all = requests.get(stack_url, headers=headers, verify=False)
+            all_stacks = r_all.json()
+            print(f"DEBUG: All available stacks: {[s.get('Name') for s in all_stacks]}")
             return
         
         stack_id = stacks[0]['Id']

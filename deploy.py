@@ -33,7 +33,7 @@ def get_endpoint_id():
 
         endpoints = response.json()
         for ep in endpoints:
-            if ep["Name"] == "local":
+            if ep["Name"] == "local-swarm":
                 return ep["Id"]
             
         # If Endpoint not found, take first available

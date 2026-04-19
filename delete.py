@@ -11,6 +11,9 @@ PORTAINER_URL = os.getenv("PORTAINER_URL")
 API_KEY = os.getenv("PORTAINER_TOKEN")
 # Same logic as in deploy.py to determine stack name
 STACK_NAME = f"{os.getenv('GITLAB_USER_LOGIN', 'unknown')}-{os.getenv('CI_COMMIT_REF_SLUG', 'default-stack')}"
+ENDPOINT_ID = 8
+# Load the compose-file
+COMPOSE_FILE = "docker-compose.yml" 
 
 if not PORTAINER_URL or not API_KEY:
     print("Error: PORTAINER_URL and PORTAINER_TOKEN environment variables must be set.")

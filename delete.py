@@ -10,7 +10,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 PORTAINER_URL = os.getenv("PORTAINER_URL")
 PORTAINER_TOKEN = os.getenv("PORTAINER_TOKEN")
 # Same logic as in deploy.py to determine stack name
-STACK_NAME = os.getenv("CI_COMMIT_REF_SLUG")
+STACK_NAME = f"{os.getenv('GITLAB_USER_LOGIN', 'unknown')}-{os.getenv('CI_COMMIT_REF_SLUG', 'default-stack')}"
 
 if not PORTAINER_URL or not PORTAINER_TOKEN:
     print("Error: PORTAINER_URL and PORTAINER_TOKEN environment variables must be set.")

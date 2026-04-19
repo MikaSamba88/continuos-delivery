@@ -20,15 +20,6 @@ def get_root():
     </html>
     """
 
-@app.get("/")
-def get_root():
-    """
-    Our root endpoint.
-
-    It greets the user.
-    """
-    return {"Hello": "World"}
-
 @app.get("/items/{item_id}")
 def reed_item(item_id, q: str | None = None):
     """

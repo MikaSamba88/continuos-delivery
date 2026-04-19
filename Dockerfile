@@ -3,7 +3,7 @@ WORKDIR /api
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 COPY main.py .
-ENTRYPOINT ["fastapi", "run", "main.py"]
+ENTRYPOINT ["fastapi", "run", "main.py", "--port", "8000"]
 
 FROM python:3.14-alpine AS test
 WORKDIR /api

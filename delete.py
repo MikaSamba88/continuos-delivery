@@ -3,7 +3,7 @@ import os
 import sys
 import urllib3
 import json
-import from deploy import get_endpoint_id, get_swarm_id, PORTAINER_URL, API_KEY, STACK_NAME, headers
+from deploy import get_endpoint_id, get_swarm_id, PORTAINER_URL, API_KEY, STACK_NAME, headers
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 

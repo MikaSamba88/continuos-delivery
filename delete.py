@@ -20,6 +20,10 @@ if not STACK_NAME:
     print("Error: CI_COMMIT_REF_SLUG environment variable is not set.")
     sys.exit(1)
 
+print(f"DEBUG: PORTAINER_URL = {PORTAINER_URL}")
+print(f"DEBUG: STACK_NAME = {STACK_NAME}")
+print(f"DEBUG: API_KEY length = {len(API_KEY) if API_KEY else 'EMPTY'}")
+
 
 headers = {
     "X-API-Key": API_KEY

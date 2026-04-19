@@ -50,8 +50,7 @@ def get_endpoint_id():
         print(f"Error fetching endpoints: {e}")
         return None
     
-    def get_swarm_id(endpoint_id):
-    """Get Swarm ID from the endpoint"""
+def get_swarm_id(endpoint_id):
     url = f"{PORTAINER_URL}/api/endpoints/{endpoint_id}/docker/swarm"
     print(f"DEBUG: Fetching swarm ID from {url}")
     try:

@@ -25,43 +25,56 @@ headers = {
     "X-API-Key": API_KEY
 }
 
+def get_endpoint_id():
+    """Get the Swarm endpoint ID"""
+    url = f"{PORTAINER_URL}/api/endpoints"
+    try:
+        response = requests.get(url, headers=headers, verify=False)
+        response.raise_for_status()
+        endpoints = response.json()
+        
+        for ep in endpoints:
+            if ep.get("Name") == "local-swarm":
+                print(f"DEBUG: Found endpoint {ep['Name']} with ID {ep['Id']}")
+                return ep["Id"]
+        
+        return endpoints[0]["Id"] if endpoints else None
+    except Exception as e:
+        print(f"Error fetching endpoints: {e}")
+        return None
+    
+
 # Find the stack by name and delete it using the Portainer API
 def delete_stack():
-    # Get the list of stacks to find the ID of the stack to delete
-    stack_url = f"{PORTAINER_URL}/api/stacks"
-    params = {
-        "filters": json.dumps({"Name": [STACK_NAME]})
-    }
-
+    endpoint_id = get_endpoint_id()
+    if not endpoint_id:
+        print("Could not find endpoint")
+        sys.exit(1)
+    
+    stack_url = f"{PORTAINER_URL}/api/endpoints/{endpoint_id}/stacks"
+    
     try:
-        r = requests.get(stack_url, headers=headers, params=params, verify=False)
+        print(f"DEBUG: Fetching stacks from {stack_url}")
+        r = requests.get(stack_url, headers=headers, verify=False)
         r.raise_for_status()
-        stacks = r.json()
-
-        if not stacks:
+        all_stacks = r.json()
+        
+        print(f"DEBUG: All stacks: {[s.get('Name') for s in all_stacks]}")
+        print(f"DEBUG: Looking for: {STACK_NAME}")
+        
+        stack = next((s for s in all_stacks if s.get('Name') == STACK_NAME), None)
+        
+        if not stack:
             print(f"Stack '{STACK_NAME}' not found.")
-            print(f"DEBUG: Looking for stack: {STACK_NAME}")
-
-            r_all = requests.get(stack_url, headers=headers, verify=False)
-            all_stacks = r_all.json()
-            print(f"DEBUG: All available stacks: {[s.get('Name') for s in all_stacks]}")
             return
         
-        stack_id = stacks[0]['Id']
-        # need to get the endpoint ID as well
-        endpoint_id = stacks[0]['EndpointId']
-
-        # Delete the stack
-        delete_url = f"{PORTAINER_URL}/api/stacks/{stack_id}?endpointId={endpoint_id}"
-        print(f"Deleting stack '{STACK_NAME}' with ID {stack_id}...")
-
+        delete_url = f"{PORTAINER_URL}/api/endpoints/{endpoint_id}/stacks/{stack['Id']}"
+        print(f"Deleting from: {delete_url}")
+        
         response = requests.delete(delete_url, headers=headers, verify=False)
         response.raise_for_status()
         print(f"Stack '{STACK_NAME}' deleted successfully.")
 
-    except requests.exceptions.RequestException as e:
-        print(f"Error deleting stack: {e}")
+    except Exception as e:
+        print(f"Error: {e}")
         sys.exit(1)
-
-if __name__ == "__main__":
-    delete_stack()

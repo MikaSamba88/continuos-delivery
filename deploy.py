@@ -42,6 +42,21 @@ def get_endpoint_id():
         print(f"Error fetching endpoints: {e}")
         sys.exit(1)
 
+def get_swarm_id(endpoint_id):
+    """Get Swarm ID from the endpoint"""
+    url = f"{PORTAINER_URL}/api/endpoints/{endpoint_id}/docker/swarm"
+    print(f"Debug: Fetching swarm ID from {url}")
+    try:
+        response = requests.get(url, headers=headers, verify=False)
+        response.raise_for_status()
+        swarm_data = response.json()
+        swarm_id = swarm_data.get("ID")
+        print(f"Debug: Swarm ID = {swarm_id}")
+        return swarm_id
+    except Exception as e:
+        print(f"Error fetching swarm ID: {e}")
+        return None
+
 def deploy_stack(endpoint_id):
 # Deploying stack to Portainer
     with open(COMPOSE_FILE, 'r') as f:
@@ -87,8 +102,9 @@ def deploy_stack(endpoint_id):
 if __name__ == "__main__":
     eid = get_endpoint_id()
     if eid:
+        swarm_id = get_swarm_id(eid)
+        print(f"Using Endpoint ID: {eid} with Swarm ID: {swarm_id}")
         deploy_stack(eid)
-        print(f"Deploying to Portainer Endpoint ID: {eid}")
     else:
         print("No endpoints found in Portainer.")
         sys.exit(1)

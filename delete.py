@@ -58,7 +58,8 @@ def delete_stack():
         print("Could not find endpoint")
         sys.exit(1)
     
-    stack_url = f"{PORTAINER_URL}/api/endpoints/{endpoint_id}/stacks"
+    stack_url = f"{PORTAINER_URL}/api/stacks"
+    params = {"filters": json.dumps({"Name": [STACK_NAME]})}
     
     try:
         print(f"DEBUG: Fetching stacks from {stack_url}")
@@ -75,7 +76,7 @@ def delete_stack():
             print(f"Stack '{STACK_NAME}' not found.")
             return
         
-        delete_url = f"{PORTAINER_URL}/api/endpoints/{endpoint_id}/stacks/{stack['Id']}"
+        delete_url = f"{PORTAINER_URL}/api/stacks/{stack['Id']}?endpointId={endpoint_id}"
         print(f"Deleting from: {delete_url}")
         
         response = requests.delete(delete_url, headers=headers, verify=False)

@@ -9,6 +9,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 PORTAINER_URL = os.getenv("PORTAINER_URL")
 API_KEY = os.getenv("PORTAINER_TOKEN")
 STACK_NAME = os.getenv("CI_COMMIT_REF_SLUG", "default-stack") # Using branch name as stack name 
+ENDPOINT_ID = 8
 # Load the compose-file
 COMPOSE_FILE = "docker-compose.yml" 
 

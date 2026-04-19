@@ -4,15 +4,24 @@ services:
     networks:
       - traefik-public
     deploy:
+      mode: replicated
+      replicas: 1
       labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.${STACK_NAME}.rule=Host(`${STACK_NAME}.doe25.swarm.chas-lab.dev`)"
-        - "traefik.http.routers.${STACK_NAME}.entrypoints=https"
-        - "traefik.http.routers.${STACK_NAME}.tls=true"
-        - "traefik.http.routers.${STACK_NAME}.tls.certresolver=le"
+        - "traefik.constraint-label=traefik-public"
+        - "traefik.swarm.network=traefik-public"
+
+        - "traefik.http.routers.${STACK_NAME}-http.rule=Host(`${STACK_NAME}.doe25.swarm.chas-lab.dev`)"
+        - "traefik.http.routers.${STACK_NAME}-http.entrypoints=http"
+        - "traefik.http.routers.${STACK_NAME}-http.middlewares=https-redirect"
+
+        - "traefik.http.routers.${STACK_NAME}-https.rule=Host(`${STACK_NAME}.doe25.swarm.chas-lab.dev`)"
+        - "traefik.http.routers.${STACK_NAME}-https.entrypoints=https"
+        - "traefik.http.routers.${STACK_NAME}-https.tls=true"
+        - "traefik.http.routers.${STACK_NAME}-https.tls.certresolver=le"
+
         - "traefik.http.services.${STACK_NAME}.loadbalancer.server.port=8000"
 
 networks:
   traefik-public:
     external: true
-    name: "u2vny23362londw734lqofhvz"  # Detta är din "räddare i nöden" mot felmeddelandet

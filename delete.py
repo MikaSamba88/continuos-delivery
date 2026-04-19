@@ -3,10 +3,17 @@ import os
 import sys
 import urllib3
 import json
-from deploy import get_endpoint_id, get_swarm_id, PORTAINER_URL, API_KEY, STACK_NAME, headers
+from deploy import get_endpoint_id
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
+PORTAINER_URL = os.getenv("PORTAINER_URL")
+API_KEY = os.getenv("PORTAINER_TOKEN")
+STACK_NAME = f"{os.getenv('GITLAB_USER_LOGIN', 'unknown')}-{os.getenv('CI_COMMIT_REF_SLUG', 'default-stack')}"
+
+headers = {
+    "X-API-Key": API_KEY
+}
 
 # Find the stack by name and delete it using the Portainer API
 def delete_stack():

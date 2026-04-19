@@ -61,12 +61,15 @@ def deploy_stack(endpoint_id):
 # Deploying stack to Portainer
     with open(COMPOSE_FILE, 'r') as f:
         compose_content = f.read()
+
     image_path = os.getenv("CI_REGISTRY_IMAGE", "")
     image_tag = os.getenv("IMAGE_TAG", "latest")
+    project_slug = os.getenv("CI_PROJECT_NAME", "my-project").lower()
 
     compose_content = compose_content.replace("${CI_REGISTRY_IMAGE}", image_path)
     compose_content = compose_content.replace("${IMAGE_TAG}", image_tag)
     compose_content = compose_content.replace("${STACK_NAME}", STACK_NAME)
+    compose_content = compose_content.replace("${PROJECT_SLUG}", project_slug)
     print(f"DEBUG: Image line is: {[line for line in compose_content.splitlines() if 'image:' in line]}")
 
     stack_url = f"{PORTAINER_URL}/api/stacks"
@@ -80,15 +83,17 @@ def deploy_stack(endpoint_id):
         url = f"{PORTAINER_URL}/api/stacks/{stack_id}?endpointId={endpoint_id}"
         payload = {
             "StackFileContent": compose_content,
-            "prune": True
+            "prune": True,
+            "PullImage": True
         }
         r = requests.put(url, headers=headers, json=payload, verify=False)
     else:
         print(f"Creating new stack '{STACK_NAME}'")
-        url = f"{PORTAINER_URL}/api/stacks/create/standalone/string?endpointId={endpoint_id}"
+        url = f"{PORTAINER_URL}/api/stacks/create/swarm/string?endpointId={endpoint_id}"
         payload = {
             "Name": STACK_NAME,
             "StackFileContent": compose_content,
+            "SwarmID": swarm_id,
             "Prune": True
         }
         print(url)
@@ -102,9 +107,9 @@ def deploy_stack(endpoint_id):
 if __name__ == "__main__":
     eid = get_endpoint_id()
     if eid:
-        swarm_id = get_swarm_id(eid)
-        print(f"Using Endpoint ID: {eid} with Swarm ID: {swarm_id}")
-        deploy_stack(eid)
+        sid = get_swarm_id(eid)
+        print(f"Using Endpoint ID: {eid} with Swarm ID: {sid}")
+        deploy_stack(eid, sid)
     else:
         print("No endpoints found in Portainer.")
         sys.exit(1)

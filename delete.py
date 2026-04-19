@@ -50,6 +50,21 @@ def get_endpoint_id():
         print(f"Error fetching endpoints: {e}")
         return None
     
+    def get_swarm_id(endpoint_id):
+    """Get Swarm ID from the endpoint"""
+    url = f"{PORTAINER_URL}/api/endpoints/{endpoint_id}/docker/swarm"
+    print(f"DEBUG: Fetching swarm ID from {url}")
+    try:
+        response = requests.get(url, headers=headers, verify=False)
+        response.raise_for_status()
+        swarm_data = response.json()
+        swarm_id = swarm_data.get("ID")
+        print(f"DEBUG: Swarm ID = {swarm_id}")
+        return swarm_id
+    except Exception as e:
+        print(f"Error fetching swarm ID: {e}")
+        return None
+    
 
 # Find the stack by name and delete it using the Portainer API
 def delete_stack():

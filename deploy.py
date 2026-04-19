@@ -57,7 +57,7 @@ def get_swarm_id(endpoint_id):
         print(f"Error fetching swarm ID: {e}")
         return None
 
-def deploy_stack(endpoint_id):
+def deploy_stack(endpoint_id, swarm_id):
 # Deploying stack to Portainer
     with open(COMPOSE_FILE, 'r') as f:
         compose_content = f.read()

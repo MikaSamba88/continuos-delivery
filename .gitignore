@@ -1,1 +1,39 @@
+### Python ###
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+
+### Miljövariabler & Hemligheter (Viktigt!) ###
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+### Docker ###
+.docker/
+# Om du sparar containertillstånd lokalt
+.docker-desktop/
+
+### OS & Editor ###
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+.vscode/
+.idea/
+
+### Projekt-specifikt ###
+# Om dina deploy-skript skapar temporära loggar eller filer
+*.log
+scripts/*.tmp

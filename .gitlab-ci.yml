@@ -1,5 +1,8 @@
 stages:
   - build
+  - test
+  - deploy
+  - cleanup
 
 build api:
   stage: build
@@ -7,4 +10,72 @@ build api:
   before_script:
     - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
   script:
-    - docker buildx build -t $CI_REGISTRY_IMAGE:latest --cache-from=$CI_REGISTRY_IMAGE:latest --push .
+    - docker buildx build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG --cache-from=$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG --push . --target=deploy
+    - docker buildx build -t $CI_REGISTRY_IMAGE:test-$CI_COMMIT_REF_SLUG --cache-from=$CI_REGISTRY_IMAGE:test-$CI_COMMIT_REF_SLUG --push . --target=test
+  rules:
+    - changes:
+      - Dockerfile
+      - "src/**/*.py"
+      - "src/requirements.txt"
+      - "tests/test_requirements.txt"
+      if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH || $CI_MERGE_REQUEST_ID
+
+build utils:
+  stage: build
+  image: docker:29
+  before_script:
+    - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
+  script:
+    - docker buildx build -t ${CI_REGISTRY_IMAGE}/utils:latest --push --file Dockerfile-utils .
+  rules:
+    - changes:
+        - Dockerfile-utils
+      if: $CI_MERGE_REQUEST_ID || $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+
+#https://git.chas-lab.dev/doe25/test-rest/-/tree/tdd?ref_type=heads
+test api:
+  stage: test
+  image: $CI_REGISTRY_IMAGE:test-$CI_COMMIT_REF_SLUG
+  #gitlab coverage report: https://docs.gitlab.com/ci/testing/code_coverage/
+  script:
+    - pytest tests/ --cov --cov-fail-under=90
+  coverage: '/TOTAL.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
+  rules:
+    - if: $CI_MERGE_REQUEST_ID
+      changes:
+        - "src/**/*.py"
+        - "tests/**/*.py"
+deploy api:
+  stage: deploy
+  image: ${CI_REGISTRY_IMAGE}/utils:latest
+  environment:
+    name: review/$CI_COMMIT_REF_SLUG
+    url: https://$CI_PROJECT_NAMESPACE_SLUG-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG.doe25.swarm.chas-lab.dev/docs
+    on_stop: stop_review
+  variables:
+    PORTAINER_URL: "https://portainer.doe25.swarm.chas-lab.dev"
+    CI_REGISTRY_IMAGE: $CI_REGISTRY_IMAGE
+    IMAGE_TAG: $CI_COMMIT_REF_SLUG
+  script:
+    - python scripts/deploy.py
+  rules:
+    - if: $CI_MERGE_REQUEST_ID
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+
+    
+stop_review:
+  stage: cleanup
+  image: $CI_REGISTRY_IMAGE/utils:latest
+  environment:
+    name: review/$CI_COMMIT_REF_SLUG
+    action: stop
+  script:
+    - python scripts/delete.py
+  variables:
+    PORTAINER_URL: "https://portainer.doe25.swarm.chas-lab.dev"
+  rules:
+    - if: $CI_MERGE_REQUEST_ID
+      when: manual
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+      when: manual
+

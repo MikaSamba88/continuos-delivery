@@ -1,18 +1,24 @@
 import random
 import subprocess
 
+from fastapi.responses import HTMLResponse
 from fastapi import FastAPI
 
 app = FastAPI()
 
-@app.get("/")
-def get_root():
-    """
-    Our root endpoint.
 
-    It greets the user.
+@app.get("/", response_class=HTMLResponse)
+def get_root():
+    return """
+    <html>
+        <head><title>Min FastAPI</title></head>
+        <body>
+            <h1>Välkommen till mitt projekt!</h1>
+            <p>Kolla in min <a href="/random-gif">slumpmässiga gif</a> eller se 
+            <a href="/docs">API-dokumentationen</a>.</p>
+        </body>
+    </html>
     """
-    return {"Hello": "World"}
 
 @app.get("/items/{item_id}")
 def reed_item(item_id, q: str | None = None):

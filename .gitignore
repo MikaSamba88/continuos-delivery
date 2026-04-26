@@ -1,1 +1,12 @@
+# Python lokalt
+__pycache__/
+.pytest_cache/
+.venv/
+.coverage
+htmlcov/
+
+# Miljövariabler (Viktigt om du har lösenord/tokens)
+.env
+
+# OS-specifikt
 .DS_Store

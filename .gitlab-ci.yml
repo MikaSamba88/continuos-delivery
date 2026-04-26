@@ -15,9 +15,9 @@ build api:
   rules:
     - changes:
       - Dockerfile
-      - "*.py"
-      - requirements.txt
-      - test_requirements.txt
+      - "src/**/*.py"
+      - "src/requirements.txt"
+      - "tests/test_requirements.txt"
       if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH || $CI_MERGE_REQUEST_ID
 
 build utils:
@@ -38,13 +38,13 @@ test api:
   image: $CI_REGISTRY_IMAGE:test-$CI_COMMIT_REF_SLUG
   #gitlab coverage report: https://docs.gitlab.com/ci/testing/code_coverage/
   script:
-    - pytest --cov --cov-fail-under=90
+    - pytest tests/ --cov --cov-fail-under=90
   coverage: '/TOTAL.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
   rules:
     - if: $CI_MERGE_REQUEST_ID
       changes:
-        - "*.py"
-
+        - "src/**/*.py"
+        - "tests/**/*.py"
 deploy api:
   stage: deploy
   image: ${CI_REGISTRY_IMAGE}/utils:latest
@@ -57,7 +57,7 @@ deploy api:
     CI_REGISTRY_IMAGE: $CI_REGISTRY_IMAGE
     IMAGE_TAG: $CI_COMMIT_REF_SLUG
   script:
-    - python deploy.py
+    - python scripts/deploy.py
   rules:
     - if: $CI_MERGE_REQUEST_ID
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
@@ -70,7 +70,7 @@ stop_review:
     name: review/$CI_COMMIT_REF_SLUG
     action: stop
   script:
-    - python delete.py
+    - python scripts/delete.py
   variables:
     PORTAINER_URL: "https://portainer.doe25.swarm.chas-lab.dev"
   rules:
